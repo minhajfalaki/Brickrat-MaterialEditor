@@ -128,6 +128,37 @@ function exitMaterialEditMode() {
 
 document.addEventListener('materialEditorClose', exitMaterialEditMode);
 
+// ------------------------------------------------------------
+//  Cursor mode — press C while walking to free the mouse cursor
+// ------------------------------------------------------------
+let _cursorMode = false;
+
+function enterCursorMode() {
+  fpController.enabled = false;
+  document.exitPointerLock();
+  const clickPrompt = document.getElementById('clickPrompt');
+  if (clickPrompt) clickPrompt.style.display = 'none';
+  _cursorMode = true;
+  const hint = document.getElementById('cursorHint');
+  if (hint) hint.style.display = 'block';
+}
+
+function exitCursorMode() {
+  _cursorMode = false;
+  fpController.enabled = true;
+  const hint = document.getElementById('cursorHint');
+  if (hint) hint.style.display = 'none';
+  renderer.domElement.requestPointerLock();
+}
+
+window.addEventListener('keydown', e => {
+  if (e.code === 'KeyC') {
+    if (_materialEditMode) return;
+    if (_cursorMode) exitCursorMode();
+    else if (fpController.isLocked) enterCursorMode();
+  }
+});
+
 initPanel();
 
 // ------------------------------------------------------------
