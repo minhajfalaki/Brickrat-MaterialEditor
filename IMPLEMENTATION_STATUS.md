@@ -16,6 +16,9 @@ Feature spec: `GLB_Material_Editor_Agent_Guide.md`
 | 8 | Add button + panel HTML + CSS link | `index.html` | ✅ Done |
 | 9 | Commit & push | — | ✅ Done |
 | 10 | Cursor mode (C key) for UI/surface access during walkthrough | `main.js`, `index.html` | ✅ Done |
+| 11 | GLB material browser — "All materials in the model" section with drag-to-apply | `materialEditor.js`, `materialPanel.js`, `materialPanel.css`, `index.html`, `main.js` | ✅ Done |
+| 12 | Fix: freeze navigation in cursor mode (WASD was still active) | `js/controls/FirstPersonControls.js` | ✅ Done |
+| 13 | Fix: preserve camera position/orientation when entering material edit mode | `main.js` | ✅ Done |
 
 ## Status key
 - ⬜ Pending

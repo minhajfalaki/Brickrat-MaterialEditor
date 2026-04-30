@@ -69,15 +69,16 @@ ConvApp/
 │   └── three-mesh-bvh/   ← BVH raycasting acceleration
 ├── js/
 │   ├── controls/         ← FirstPersonControls, MobileControls
-│   ├── interaction/      ← collisionInteraction, cameraCollision
+│   ├── interaction/      ← collisionInteraction, cameraCollision, materialEditor, materialLibrary
 │   ├── loaders/          ← furniture, lights, collision boxes
-│   ├── menus/            ← MenuManager (editing UI)
+│   ├── menus/            ← MenuManager (editing UI), materialPanel
 │   ├── bake/             ← texture baking utility
 │   ├── utils/            ← spawner, findStartPosition
 │   ├── collab.js         ← Liveblocks presence + peer avatars
 │   └── voice.js          ← Daily.co audio
 ├── styles/
-│   └── menu.css          ← menu/submenu/furniture grid styles
+│   ├── menu.css          ← menu/submenu/furniture grid styles
+│   └── materialPanel.css ← material editor panel styles
 └── assets/, assets2/, images/, models/
 ```
 
@@ -106,7 +107,22 @@ ConvApp/
 | `SpriteMaterial` | Canvas-rendered name labels above peer pins (`js/collab.js`) |
 | Baked (light-map) | Pre-baked lighting via `js/bake/bakeUtility.js` |
 
-GLB models are loaded and displayed as-is — materials come from the file, with no runtime modification today.
+GLB materials can be browsed and replaced at runtime via the Material Editor (see section below).
+
+### Material Editor
+
+A fixed sidebar panel (right side) activated by a toolbar button or C key (cursor mode).
+
+| Capability | Detail |
+|---|---|
+| Surface selection | Click a mesh to select it; highlighted with emissive tint |
+| GLB material browser | "All materials in the model" grid — all unique materials from the loaded GLB, shown as colour swatches |
+| Drag-to-apply | Drag any GLB material tile onto the selected surface info area to apply it |
+| Custom library | User-created materials stored in IndexedDB (color, opacity, optional texture) |
+| Undo | Restores the original material on the selected mesh |
+| Export | Downloads the modified scene as `modified_model.glb` via `GLTFExporter` |
+
+Key files: `js/interaction/materialEditor.js`, `js/interaction/materialLibrary.js`, `js/menus/materialPanel.js`, `styles/materialPanel.css`, `lib/three/GLTFExporter.js`
 
 ---
 
