@@ -155,6 +155,7 @@ export class FirstPersonController {
    * Main update — call every frame with elapsed seconds.
    */
   update(dt) {
+    if (!this.enabled) return;
     // Always apply camera rotation so the view is correct even before the
     // pointer is locked (e.g. the initial "Click to explore" frame).
     this._applyRotation();
