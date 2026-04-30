@@ -106,6 +106,10 @@ function enterMaterialEditMode() {
   document.exitPointerLock();
   const clickPrompt = document.getElementById('clickPrompt');
   if (clickPrompt) clickPrompt.style.display = 'none';
+  const _fwd = new THREE.Vector3();
+  camera.getWorldDirection(_fwd);
+  orbitControls.target.copy(camera.position).addScaledVector(_fwd, 5);
+  orbitControls.update();
   orbitControls.enabled = true;
   _materialEditMode = true;
   const btn = document.getElementById('btnMaterialEditor');
