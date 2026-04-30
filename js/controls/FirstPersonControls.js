@@ -73,6 +73,9 @@ export class FirstPersonController {
     // Set false to pass through walls (ghost mode)
     this.wallCollisionEnabled = true;
 
+    // Set false to disable all input (used by material editor mode)
+    this.enabled = true;
+
     // Mobile controls reference (set via setMobileMode)
     this._mobile = null;
 
@@ -174,12 +177,14 @@ export class FirstPersonController {
     // Using document instead of domElement because the "Ready to Explore"
     // overlay sits on top of the canvas and would swallow the click otherwise.
     document.addEventListener('click', () => {
+      if (!this.enabled) return;
       if (!this.isLocked) {
         this.domElement.requestPointerLock();
       }
     });
 
     document.addEventListener('pointerlockchange', () => {
+      if (!this.enabled) return;
       this.isLocked = document.pointerLockElement === this.domElement;
 
       // Show/hide the "click to explore" overlay

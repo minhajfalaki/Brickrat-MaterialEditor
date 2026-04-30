@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Building Walkthrough</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles/materialPanel.css">
   <meta name="theme-color" content="#B8CEDD">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -564,6 +565,17 @@
     <span id="speakingIndicator" style="display:none; font-family:sans-serif; font-size:12px; color:#66ff88;">&#9679; Speaking</span>
   </div>
 
+  <!-- Material editor toggle button (shown after model loads) -->
+  <button id="btnMaterialEditor" title="Material Editor" aria-label="Material Editor">
+    <svg viewBox="0 0 24 24">
+      <circle cx="13.5" cy="6.5" r="2.5"/>
+      <circle cx="17.5" cy="10.5" r="2.5"/>
+      <circle cx="8.5"  cy="7.5"  r="2.5"/>
+      <circle cx="6.5"  cy="12.5" r="2.5"/>
+      <path d="M3 19a9 9 0 0 1 15-6.7"/>
+    </svg>
+  </button>
+
   <!-- Ghost-mode button (shown after model loads) -->
   <button id="btnGhost" title="Ghost mode — pass through walls for 3 s" aria-label="Ghost mode">
     <svg viewBox="0 0 24 24">
@@ -617,6 +629,51 @@
           <button id="btnDoJoinModal" class="call-ui-btn">Join</button>
         </div>
         <span id="joinErrorModal" style="display:none;font-family:sans-serif;font-size:12px;color:rgba(255,110,110,0.95);"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Material editor panel -->
+  <div id="materialPanel">
+    <div class="mp-header">
+      <span>Material Editor</span>
+      <button class="mp-close" id="mpClose" title="Close">&#x2715;</button>
+    </div>
+    <div class="mp-surface" id="mpSurface">
+      <span>Click a surface to select</span>
+    </div>
+    <div class="mp-section-label">Your Materials</div>
+    <div class="mp-grid" id="mpGrid"></div>
+    <div class="mp-actions">
+      <button class="mp-btn mp-btn-primary" id="mpBtnAdd">+ Add Material</button>
+      <button class="mp-btn" id="mpBtnUndo" disabled>Undo Last Change</button>
+      <button class="mp-btn" id="mpBtnExport">Export GLB</button>
+    </div>
+  </div>
+
+  <!-- Add material modal -->
+  <div id="mpAddModal">
+    <div class="mp-modal-box">
+      <h3>New Material</h3>
+      <div class="mp-modal-field">
+        <label>Name</label>
+        <input type="text" id="mpAddName" placeholder="e.g. Concrete Wall" maxlength="40">
+      </div>
+      <div class="mp-modal-field">
+        <label>Color</label>
+        <input type="color" id="mpAddColor" value="#c8a070">
+      </div>
+      <div class="mp-modal-field">
+        <label>Opacity (0–1)</label>
+        <input type="number" id="mpAddOpacity" value="1" min="0" max="1" step="0.05">
+      </div>
+      <div class="mp-modal-field">
+        <label>Texture image (optional)</label>
+        <input type="file" id="mpAddTexture" accept="image/*">
+      </div>
+      <div class="mp-modal-row">
+        <button class="mp-btn" id="mpAddCancel">Cancel</button>
+        <button class="mp-btn mp-btn-primary" id="mpAddSave">Save</button>
       </div>
     </div>
   </div>

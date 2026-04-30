@@ -1,8 +1,11 @@
 import * as THREE from './lib/three/three.module.js';
 import { GLTFLoader }           from './lib/three/loaders/GLTFLoader.js';
+import { OrbitControls }        from './lib/three/controls/OrbitControls.js';
 import { FirstPersonController } from './js/controls/FirstPersonControls.js';
 import { MobileControls }       from './js/controls/MobileControls.js';
 import { findStartPosition }    from './js/utils/findStartPosition.js';
+import { enterEditMode, exitEditMode } from './js/interaction/materialEditor.js';
+import { initPanel, showPanel, hidePanel, updateSurfaceInfo } from './js/menus/materialPanel.js';
 
 // ============================================================
 //  Device detection
@@ -87,15 +90,65 @@ document.body.appendChild(renderer.domElement);
 const fpController = new FirstPersonController(camera, renderer.domElement, { isMobile });
 
 // ------------------------------------------------------------
+//  Orbit controls (used in material editor mode)
+// ------------------------------------------------------------
+const orbitControls = new OrbitControls(camera, renderer.domElement);
+orbitControls.enabled = false;
+orbitControls.enableDamping = true;
+
+// ------------------------------------------------------------
+//  Material editor mode toggle
+// ------------------------------------------------------------
+let _materialEditMode = false;
+
+function enterMaterialEditMode() {
+  fpController.enabled = false;
+  document.exitPointerLock();
+  const clickPrompt = document.getElementById('clickPrompt');
+  if (clickPrompt) clickPrompt.style.display = 'none';
+  orbitControls.enabled = true;
+  _materialEditMode = true;
+  const btn = document.getElementById('btnMaterialEditor');
+  if (btn) btn.classList.add('mat-edit-active');
+  enterEditMode(scene, camera, renderer.domElement, info => updateSurfaceInfo(info));
+  showPanel();
+}
+
+function exitMaterialEditMode() {
+  exitEditMode();
+  hidePanel();
+  orbitControls.enabled = false;
+  fpController.enabled = true;
+  _materialEditMode = false;
+  const btn = document.getElementById('btnMaterialEditor');
+  if (btn) btn.classList.remove('mat-edit-active');
+  const clickPrompt = document.getElementById('clickPrompt');
+  if (clickPrompt) clickPrompt.style.display = 'flex';
+}
+
+document.addEventListener('materialEditorClose', exitMaterialEditMode);
+
+initPanel();
+
+// ------------------------------------------------------------
 //  Loading manager + progress ring
 // ------------------------------------------------------------
-const loadingOverlay   = document.getElementById('loadingOverlay');
-const clickPrompt      = document.getElementById('clickPrompt');
-const btnGhost         = document.getElementById('btnGhost');
-const btnCallFloat     = document.getElementById('btnCallFloat');
-const fpsCounter       = document.getElementById('fpsCounter');
-const progressText     = document.getElementById('progressText');
-const progressCircle   = document.querySelector('.progress-ring__circle');
+const loadingOverlay      = document.getElementById('loadingOverlay');
+const clickPrompt         = document.getElementById('clickPrompt');
+const btnGhost            = document.getElementById('btnGhost');
+const btnCallFloat        = document.getElementById('btnCallFloat');
+const btnMaterialEditor   = document.getElementById('btnMaterialEditor');
+const fpsCounter          = document.getElementById('fpsCounter');
+const progressText        = document.getElementById('progressText');
+const progressCircle      = document.querySelector('.progress-ring__circle');
+
+if (btnMaterialEditor) {
+  btnMaterialEditor.addEventListener('click', e => {
+    e.stopPropagation();
+    if (_materialEditMode) exitMaterialEditMode();
+    else enterMaterialEditMode();
+  });
+}
 
 const CIRCUMFERENCE = 2 * Math.PI * 50; // r=50 → ~314
 
@@ -140,11 +193,12 @@ const manager = new THREE.LoadingManager(
     setProgress(100);
     // Brief pause so the 100% renders, then swap overlays
     setTimeout(() => {
-      if (loadingOverlay) loadingOverlay.style.display = 'none';
-      if (clickPrompt)    clickPrompt.style.display    = 'flex';
-      if (btnGhost)       btnGhost.style.display       = 'flex';
-      if (btnCallFloat)   btnCallFloat.style.display   = 'flex';
-      if (fpsCounter)     fpsCounter.style.display     = 'block';
+      if (loadingOverlay)    loadingOverlay.style.display    = 'none';
+      if (clickPrompt)       clickPrompt.style.display       = 'flex';
+      if (btnGhost)          btnGhost.style.display          = 'flex';
+      if (btnCallFloat)      btnCallFloat.style.display      = 'flex';
+      if (btnMaterialEditor) btnMaterialEditor.style.display = 'flex';
+      if (fpsCounter)        fpsCounter.style.display        = 'block';
       _modelLoaded = true;
     }, 400);
   },
@@ -509,7 +563,11 @@ function animate() {
     fpsElapsed = 0;
   }
 
-  fpController.update(dt);
+  if (_materialEditMode) {
+    orbitControls.update();
+  } else {
+    fpController.update(dt);
+  }
 
   broadcastAccum += dt;
   if (broadcastAccum >= 0.15) {
