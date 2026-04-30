@@ -128,6 +128,9 @@ function exitMaterialEditMode() {
   _materialEditMode = false;
   const btn = document.getElementById('btnMaterialEditor');
   if (btn) btn.classList.remove('mat-edit-active');
+  _cursorMode = false;
+  const hint = document.getElementById('cursorHint');
+  if (hint) hint.style.display = 'none';
   renderer.domElement.requestPointerLock();
 }
 
@@ -149,19 +152,10 @@ function enterCursorMode() {
   if (hint) hint.style.display = 'block';
 }
 
-function exitCursorMode() {
-  _cursorMode = false;
-  fpController.enabled = true;
-  const hint = document.getElementById('cursorHint');
-  if (hint) hint.style.display = 'none';
-  renderer.domElement.requestPointerLock();
-}
-
 window.addEventListener('keydown', e => {
   if (e.code === 'KeyC') {
-    if (_materialEditMode) return;
-    if (_cursorMode) exitCursorMode();
-    else if (fpController.isLocked) enterCursorMode();
+    if (_materialEditMode || _cursorMode) return;
+    if (fpController.isLocked) enterCursorMode();
   }
 });
 
