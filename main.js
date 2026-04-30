@@ -103,6 +103,7 @@ let _materialEditMode = false;
 
 function enterMaterialEditMode() {
   fpController.enabled = false;
+  fpController.isLocked = false;
   document.exitPointerLock();
   const clickPrompt = document.getElementById('clickPrompt');
   if (clickPrompt) clickPrompt.style.display = 'none';
@@ -127,8 +128,7 @@ function exitMaterialEditMode() {
   _materialEditMode = false;
   const btn = document.getElementById('btnMaterialEditor');
   if (btn) btn.classList.remove('mat-edit-active');
-  const clickPrompt = document.getElementById('clickPrompt');
-  if (clickPrompt) clickPrompt.style.display = 'flex';
+  renderer.domElement.requestPointerLock();
 }
 
 document.addEventListener('materialEditorClose', exitMaterialEditMode);
@@ -140,6 +140,7 @@ let _cursorMode = false;
 
 function enterCursorMode() {
   fpController.enabled = false;
+  fpController.isLocked = false;
   document.exitPointerLock();
   const clickPrompt = document.getElementById('clickPrompt');
   if (clickPrompt) clickPrompt.style.display = 'none';
