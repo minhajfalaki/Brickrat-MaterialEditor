@@ -77,13 +77,30 @@
   flex-shrink: 0;
 }
 
+.mp-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
 .mp-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 7px;
   padding: 4px 16px 8px;
-  overflow-y: auto;
-  flex: 1;
+}
+
+.mp-surface.drag-over {
+  background: rgba(52,152,219,0.18);
+  border-bottom-color: rgba(52,152,219,0.55);
+  outline: 1px dashed rgba(52,152,219,0.7);
+}
+
+.mp-tile[draggable="true"] {
+  cursor: grab;
+}
+.mp-tile[draggable="true"]:active {
+  cursor: grabbing;
 }
 
 .mp-tile {

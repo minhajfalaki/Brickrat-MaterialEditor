@@ -1,14 +1,31 @@
 import { loadLibrary, saveMaterial, deleteMaterial } from '../interaction/materialLibrary.js';
-import { applyMaterial, undoMaterial, canUndo, exportGLB } from '../interaction/materialEditor.js';
+import { applyMaterial, undoMaterial, canUndo, exportGLB, getSceneMaterials, applyGlbMaterial } from '../interaction/materialEditor.js';
 
-let _panel, _surfaceEl, _gridEl, _btnUndo, _addModal;
+let _panel, _surfaceEl, _gridEl, _glbGridEl, _btnUndo, _addModal;
 
 export function initPanel() {
   _panel      = document.getElementById('materialPanel');
   _surfaceEl  = document.getElementById('mpSurface');
   _gridEl     = document.getElementById('mpGrid');
+  _glbGridEl  = document.getElementById('mpGlbGrid');
   _btnUndo    = document.getElementById('mpBtnUndo');
   _addModal   = document.getElementById('mpAddModal');
+
+  _surfaceEl.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    _surfaceEl.classList.add('drag-over');
+  });
+  _surfaceEl.addEventListener('dragleave', () => _surfaceEl.classList.remove('drag-over'));
+  _surfaceEl.addEventListener('drop', e => {
+    e.preventDefault();
+    _surfaceEl.classList.remove('drag-over');
+    const uuid = e.dataTransfer.getData('text/plain');
+    if (uuid) {
+      applyGlbMaterial(uuid);
+      _refreshUndoBtn();
+    }
+  });
 
   document.getElementById('mpClose').addEventListener('click', () => {
     document.dispatchEvent(new CustomEvent('materialEditorClose'));
@@ -102,6 +119,36 @@ function _makeTile(m) {
 
 function _refreshUndoBtn() {
   if (_btnUndo) _btnUndo.disabled = !canUndo();
+}
+
+export function populateGlbMaterials() {
+  if (!_glbGridEl) return;
+  const mats = getSceneMaterials();
+  _glbGridEl.innerHTML = '';
+  for (const m of mats) {
+    const tile = document.createElement('div');
+    tile.className = 'mp-tile';
+    tile.title = m.name;
+    tile.draggable = true;
+    tile.dataset.uuid = m.uuid;
+    tile.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', m.uuid);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+
+    const preview = document.createElement('div');
+    preview.className = 'mp-tile-preview';
+    preview.style.background = m.color || '#888';
+    if (m.hasTexture) preview.style.outline = '2px solid rgba(255,200,80,0.6)';
+
+    const name = document.createElement('div');
+    name.className = 'mp-tile-name';
+    name.textContent = m.name;
+
+    tile.appendChild(preview);
+    tile.appendChild(name);
+    _glbGridEl.appendChild(tile);
+  }
 }
 
 async function _onSaveMaterial() {

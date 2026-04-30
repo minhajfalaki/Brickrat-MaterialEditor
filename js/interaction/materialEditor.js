@@ -115,6 +115,48 @@ export function canUndo() {
   return !!(_selectedMesh && _originals.has(_selectedMesh));
 }
 
+export function getSceneMaterials() {
+  if (!_scene) return [];
+  const seen = new Set();
+  const result = [];
+  _scene.traverse(o => {
+    if (!o.isMesh) return;
+    const mat = o.material;
+    if (!mat || seen.has(mat.uuid)) return;
+    seen.add(mat.uuid);
+    result.push({
+      uuid: mat.uuid,
+      name: mat.name || o.name || 'Unnamed',
+      color: mat.color ? '#' + mat.color.getHexString() : null,
+      hasTexture: !!mat.map,
+    });
+  });
+  return result;
+}
+
+export function applyGlbMaterial(uuid) {
+  if (!_selectedMesh || !_scene) return;
+  let sourceMat = null;
+  _scene.traverse(o => {
+    if (o.isMesh && o.material && o.material.uuid === uuid) sourceMat = o.material;
+  });
+  if (!sourceMat) return;
+  if (!_originals.has(_selectedMesh)) {
+    _originals.set(_selectedMesh, _selectedMesh.material.clone());
+  }
+  const clone = sourceMat.clone();
+  if (clone.emissive) clone.emissive.set(0x334455);
+  _savedEmissive = new THREE.Color(0);
+  _selectedMesh.material = clone;
+  if (_onSelectionChange) {
+    _onSelectionChange({
+      name: clone.name || _selectedMesh.name || 'Unnamed surface',
+      color: clone.color ? '#' + clone.color.getHexString() : null,
+      hasTexture: !!clone.map,
+    });
+  }
+}
+
 export function exportGLB() {
   if (!_scene) return;
   const exporter = new GLTFExporter();

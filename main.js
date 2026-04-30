@@ -5,7 +5,7 @@ import { FirstPersonController } from './js/controls/FirstPersonControls.js';
 import { MobileControls }       from './js/controls/MobileControls.js';
 import { findStartPosition }    from './js/utils/findStartPosition.js';
 import { enterEditMode, exitEditMode } from './js/interaction/materialEditor.js';
-import { initPanel, showPanel, hidePanel, updateSurfaceInfo } from './js/menus/materialPanel.js';
+import { initPanel, showPanel, hidePanel, updateSurfaceInfo, populateGlbMaterials } from './js/menus/materialPanel.js';
 
 // ============================================================
 //  Device detection
@@ -112,6 +112,7 @@ function enterMaterialEditMode() {
   if (btn) btn.classList.add('mat-edit-active');
   enterEditMode(scene, camera, renderer.domElement, info => updateSurfaceInfo(info));
   showPanel();
+  populateGlbMaterials();
 }
 
 function exitMaterialEditMode() {
